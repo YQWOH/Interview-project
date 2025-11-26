@@ -49,7 +49,8 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import ImageViewer from "@/pages/ImageViewer";
 import { apiService } from "@/services/api";
-import { AuthProvider } from "@/hooks/useAuth";
+import { Provider } from "react-redux";
+import { createMockStore } from "../../utils/testHelpers";
 
 jest.mock("@/services/api");
 const mockedApiService = apiService as jest.Mocked<typeof apiService>;
@@ -104,11 +105,11 @@ describe("ImageViewer Component", () => {
   const renderImageViewer = (imageId = "img123") => {
     return render(
       <MemoryRouter initialEntries={[`/images/${imageId}`]}>
-        <AuthProvider>
+        <Provider store={createMockStore()}>
           <Routes>
             <Route path="/images/:id" element={<ImageViewer />} />
           </Routes>
-        </AuthProvider>
+        </Provider>
       </MemoryRouter>
     );
   };

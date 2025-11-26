@@ -7,14 +7,14 @@ import {
   RobotOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthRedux } from "@/hooks/useAuthRedux";
 
 const { Header, Sider, Content } = Layout;
 
 export default function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthRedux();
 
   const menuItems = [
     {

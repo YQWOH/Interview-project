@@ -12,7 +12,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import Analytics from "@/pages/Analytics";
 import { apiService } from "@/services/api";
-import { AuthProvider } from "@/hooks/useAuth";
+import { Provider } from "react-redux";
+import { createMockStore } from "../../utils/testHelpers";
 
 jest.mock("@/services/api");
 const mockedApiService = apiService as jest.Mocked<typeof apiService>;
@@ -46,9 +47,9 @@ describe("Analytics Component", () => {
   const renderAnalytics = () => {
     return render(
       <BrowserRouter>
-        <AuthProvider>
+        <Provider store={createMockStore()}>
           <Analytics />
-        </AuthProvider>
+        </Provider>
       </BrowserRouter>
     );
   };

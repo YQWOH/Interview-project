@@ -12,7 +12,8 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import Dashboard from "@/pages/Dashboard";
 import { apiService } from "@/services/api";
-import { AuthProvider } from "@/hooks/useAuth";
+import { Provider } from "react-redux";
+import { createMockStore } from "../../utils/testHelpers";
 
 jest.mock("@/services/api");
 const mockedApiService = apiService as jest.Mocked<typeof apiService>;
@@ -46,9 +47,9 @@ describe("Dashboard Component", () => {
   const renderDashboard = () => {
     return render(
       <BrowserRouter>
-        <AuthProvider>
+        <Provider store={createMockStore()}>
           <Dashboard />
-        </AuthProvider>
+        </Provider>
       </BrowserRouter>
     );
   };

@@ -8,7 +8,8 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import Login from "@/pages/Login";
-import { AuthProvider } from "@/hooks/useAuth";
+import { Provider } from "react-redux";
+import { createMockStore } from "../../utils/testHelpers";
 import { apiService } from "@/services/api";
 import { mockAuthResponse } from "../../utils/testHelpers";
 
@@ -41,9 +42,9 @@ describe("Login Component", () => {
   const renderLogin = () => {
     return render(
       <BrowserRouter>
-        <AuthProvider>
+        <Provider store={createMockStore()}>
           <Login />
-        </AuthProvider>
+        </Provider>
       </BrowserRouter>
     );
   };

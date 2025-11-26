@@ -13,7 +13,8 @@ import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import ImageList from "@/pages/ImageList";
 import { apiService } from "@/services/api";
-import { AuthProvider } from "@/hooks/useAuth";
+import { Provider } from "react-redux";
+import { createMockStore } from "../../utils/testHelpers";
 
 jest.mock("@/services/api");
 const mockedApiService = apiService as jest.Mocked<typeof apiService>;
@@ -80,9 +81,9 @@ describe("ImageList Component", () => {
   const renderImageList = () => {
     return render(
       <BrowserRouter>
-        <AuthProvider>
+        <Provider store={createMockStore()}>
           <ImageList />
-        </AuthProvider>
+        </Provider>
       </BrowserRouter>
     );
   };

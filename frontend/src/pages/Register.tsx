@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Form, Input, Button, Card, message } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthRedux } from "@/hooks/useAuthRedux";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register } = useAuthRedux();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 

@@ -38,7 +38,8 @@ jest.mock("axios", () => {
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import Detection from "@/pages/Detection";
-import { AuthProvider } from "@/hooks/useAuth";
+import { Provider } from "react-redux";
+import { createMockStore } from "../../utils/testHelpers";
 import axios from "axios";
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -118,9 +119,9 @@ describe("Detection Component", () => {
   const renderDetection = () => {
     return render(
       <BrowserRouter>
-        <AuthProvider>
+        <Provider store={createMockStore()}>
           <Detection />
-        </AuthProvider>
+        </Provider>
       </BrowserRouter>
     );
   };

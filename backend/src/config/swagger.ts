@@ -112,6 +112,54 @@ const options: swaggerJsdoc.Options = {
             },
           },
         },
+        ActivityLog: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              description: "Activity log ID",
+            },
+            action: {
+              type: "string",
+              enum: [
+                "upload",
+                "download",
+                "delete",
+                "bookmark",
+                "unbookmark",
+                "search",
+                "list",
+              ],
+              description: "Type of action performed",
+            },
+            resource: {
+              type: "string",
+              enum: ["image", "analytics"],
+              description: "Resource type affected",
+            },
+            resourceId: {
+              type: "string",
+              description: "ID of the affected resource",
+            },
+            details: {
+              type: "object",
+              description: "Additional details about the activity",
+            },
+            timestamp: {
+              type: "string",
+              format: "date-time",
+              description: "When the activity occurred",
+            },
+            ipAddress: {
+              type: "string",
+              description: "IP address of the requester",
+            },
+            userAgent: {
+              type: "string",
+              description: "User agent string of the requester",
+            },
+          },
+        },
         Error: {
           type: "object",
           properties: {
@@ -148,6 +196,10 @@ const options: swaggerJsdoc.Options = {
       {
         name: "Analytics",
         description: "Analytics and statistics endpoints",
+      },
+      {
+        name: "Activity Logs",
+        description: "Activity logging and audit trail endpoints",
       },
     ],
   },

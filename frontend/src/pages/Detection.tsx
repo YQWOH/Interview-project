@@ -24,7 +24,7 @@ import {
   ReloadOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
-import { useAuth } from "../hooks/useAuth";
+import { useAuthRedux } from "../hooks/useAuthRedux";
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -74,7 +74,7 @@ interface UserImage {
 import { API_URL } from "@/config/env";
 
 export default function Detection() {
-  const { token } = useAuth();
+  const { token } = useAuthRedux();
   const [loading, setLoading] = useState(false);
   const [loadingImages, setLoadingImages] = useState(true);
   const [result, setResult] = useState<AnalysisResult | null>(null);

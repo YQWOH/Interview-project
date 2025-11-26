@@ -7,6 +7,7 @@ import swaggerUi from "swagger-ui-express";
 import imageRoutes from "./routes/imageRoutes";
 import authRoutes from "./routes/authRoutes";
 import detectionRoutes from "./routes/detectionRoutes";
+import activityRoutes from "./routes/activityRoutes";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { logger } from "./utils/logger";
 import { swaggerSpec } from "./config/swagger";
@@ -83,6 +84,7 @@ app.get("/api-docs.json", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/detection", detectionRoutes);
+app.use("/api/activities", activityRoutes);
 
 // Static files for uploaded images
 app.use("/uploads", express.static(process.env.UPLOAD_DIR || "uploads"));

@@ -1,7 +1,23 @@
 import { ReactElement, ReactNode } from "react";
 import { render, RenderOptions } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import { Provider } from "react-redux";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import authReducer from "@/store/slices/authSlice";
+
+/**
+ * Create a mock Redux store for testing
+ */
+export function createMockStore(preloadedState?: any) {
+  const rootReducer = combineReducers({
+    auth: authReducer,
+  });
+
+  return configureStore({
+    reducer: rootReducer,
+    preloadedState,
+  });
+}
 
 /**
  * Custom render function that wraps components with Router
@@ -17,30 +33,40 @@ export function renderWithRouter(
 }
 
 /**
- * Custom render function that wraps components with Auth and Router
+ * Custom render function that wraps components with Redux and Router
  */
 export function renderWithAuth(
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
+  options?: Omit<RenderOptions, "wrapper"> & { preloadedState?: any }
 ) {
+  const { preloadedState, ...renderOptions } = options || {};
+  const store = createMockStore(preloadedState);
+
   return render(ui, {
     wrapper: ({ children }) => (
-      <BrowserRouter>
-        <AuthProvider>{children}</AuthProvider>
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>{children}</BrowserRouter>
+      </Provider>
     ),
-    ...options,
+    ...renderOptions,
   });
 }
 
 /**
- * Custom wrapper for testing hooks with Auth context
+ * Custom wrapper for testing hooks with Redux
  */
-export function AuthWrapper({ children }: { children: ReactNode }) {
+export function ReduxWrapper({
+  children,
+  preloadedState,
+}: {
+  children: ReactNode;
+  preloadedState?: any;
+}) {
+  const store = createMockStore(preloadedState);
   return (
-    <BrowserRouter>
-      <AuthProvider>{children}</AuthProvider>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>{children}</BrowserRouter>
+    </Provider>
   );
 }
 
