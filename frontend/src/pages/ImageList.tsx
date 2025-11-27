@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Table,
   Input,
@@ -28,6 +28,17 @@ import dayjs from "dayjs";
 
 const { Search } = Input;
 const { Dragger } = Upload;
+
+function debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
+  let timeout: ReturnType<typeof setTimeout>;
+
+  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      func.apply(this, args);
+    }, wait);
+  };
+}
 
 export default function ImageList() {
   const navigate = useNavigate();
@@ -76,6 +87,11 @@ export default function ImageList() {
     setFilters((prev) => ({ ...prev, search: value }));
     setPagination((prev) => ({ ...prev, current: 1 }));
   };
+
+  const handleSearchDebounce = useMemo(
+    () => debounce((value: string) => handleSearch(value), 500),
+    []
+  );
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -231,6 +247,7 @@ export default function ImageList() {
             onSearch={handleSearch}
             style={{ width: 300 }}
             prefix={<SearchOutlined />}
+            onChange={(e) => handleSearchDebounce(e?.target?.value)}
           />
           <Select
             placeholder="Filter by bookmark"
