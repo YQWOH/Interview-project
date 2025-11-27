@@ -17,11 +17,17 @@ export default function ImageViewer() {
   const navigate = useNavigate();
   const [image, setImage] = useState<PanoramaImage | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isAutoRotating, setIsAutoRotating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const meshRef = useRef<THREE.Mesh | null>(null);
+  const lonRef = useRef(0);
+  const latRef = useRef(0);
+  const animationIdRef = useRef<number | null>(null);
+  const isAutoRotatingRef = useRef(false);
 
   useEffect(() => {
     if (id) {
@@ -103,23 +109,23 @@ export default function ImageViewer() {
     let isUserInteracting = false;
     let onPointerDownMouseX = 0;
     let onPointerDownMouseY = 0;
-    let lon = 0;
     let onPointerDownLon = 0;
-    let lat = 0;
     let onPointerDownLat = 0;
 
     const onPointerDown = (event: MouseEvent) => {
       isUserInteracting = true;
       onPointerDownMouseX = event.clientX;
       onPointerDownMouseY = event.clientY;
-      onPointerDownLon = lon;
-      onPointerDownLat = lat;
+      onPointerDownLon = lonRef.current;
+      onPointerDownLat = latRef.current;
     };
 
     const onPointerMove = (event: MouseEvent) => {
       if (isUserInteracting) {
-        lon = (onPointerDownMouseX - event.clientX) * 0.1 + onPointerDownLon;
-        lat = (event.clientY - onPointerDownMouseY) * 0.1 + onPointerDownLat;
+        lonRef.current =
+          (onPointerDownMouseX - event.clientX) * 0.1 + onPointerDownLon;
+        latRef.current =
+          (event.clientY - onPointerDownMouseY) * 0.1 + onPointerDownLat;
       }
     };
 
@@ -127,17 +133,44 @@ export default function ImageViewer() {
       isUserInteracting = false;
     };
 
+    const onDoubleClick = () => {
+      if (!document.fullscreenElement) {
+        container
+          .requestFullscreen()
+          .then(() => {
+            setIsFullscreen(true);
+            setIsAutoRotating(true);
+            isAutoRotatingRef.current = true;
+          })
+          .catch((err) => {
+            console.error("Error entering fullscreen:", err);
+            message.error("Failed to enter fullscreen mode");
+          });
+      } else {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+        setIsAutoRotating(false);
+        isAutoRotatingRef.current = false;
+      }
+    };
+
     container.addEventListener("mousedown", onPointerDown);
     container.addEventListener("mousemove", onPointerMove);
     container.addEventListener("mouseup", onPointerUp);
+    container.addEventListener("dblclick", onDoubleClick);
 
     // Animation loop
     const animate = () => {
-      requestAnimationFrame(animate);
+      animationIdRef.current = requestAnimationFrame(animate);
 
-      lat = Math.max(-85, Math.min(85, lat));
-      const phi = THREE.MathUtils.degToRad(90 - lat);
-      const theta = THREE.MathUtils.degToRad(lon);
+      // Auto-rotate when in fullscreen mode and not interacting
+      if (isAutoRotatingRef.current && !isUserInteracting) {
+        lonRef.current += 0.1;
+      }
+
+      latRef.current = Math.max(-85, Math.min(85, latRef.current));
+      const phi = THREE.MathUtils.degToRad(90 - latRef.current);
+      const theta = THREE.MathUtils.degToRad(lonRef.current);
 
       const target = new THREE.Vector3(
         500 * Math.sin(phi) * Math.cos(theta),
@@ -160,13 +193,28 @@ export default function ImageViewer() {
       renderer.setSize(newWidth, newHeight);
     };
 
+    // Handle fullscreen change
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+        setIsAutoRotating(false);
+        isAutoRotatingRef.current = false;
+      }
+    };
+
     window.addEventListener("resize", handleResize);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
 
     return () => {
       container.removeEventListener("mousedown", onPointerDown);
       container.removeEventListener("mousemove", onPointerMove);
       container.removeEventListener("mouseup", onPointerUp);
+      container.removeEventListener("dblclick", onDoubleClick);
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+      }
     };
   };
 
@@ -236,10 +284,16 @@ export default function ImageViewer() {
         <div
           ref={containerRef}
           className="panorama-viewer-container"
-          style={{ cursor: "grab" }}
+          style={{
+            cursor: isAutoRotating ? "default" : "grab",
+            position: "relative",
+          }}
         />
         <p style={{ marginTop: 16, color: "#666", textAlign: "center" }}>
-          Click and drag to look around the panorama
+          Click and drag to look around • Double-click for fullscreen with
+          auto-rotation
+          {isFullscreen &&
+            " • Drag to pause, release to resume • Press ESC to exit"}
         </p>
       </Card>
 

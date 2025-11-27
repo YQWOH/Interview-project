@@ -259,7 +259,7 @@ describe("ImageViewer Component", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Click and drag to look around the panorama")
+        screen.getByText(/Click and drag to look around/)
       ).toBeInTheDocument();
     });
   });
